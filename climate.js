@@ -1,10 +1,11 @@
 'use strict';
 const Climate=(()=>{
+  const dayDurationSeconds=48*60;
   let hour=17.65,timer=0,weather=0,rain=0,wet=0;
   const names=['晴','多云','阵雨'],sequence=[0,1,2,1];
   let index=0;
   function tick(dt){
-    hour=(hour+dt/10)%24;timer+=dt;
+    hour=(hour+dt*24/dayDurationSeconds)%24;timer+=dt;
     if(timer>=49){index=(index+1)%sequence.length;weather=sequence[index];timer=0;}
     const ease=1-Math.exp(-dt*.65);rain+=((weather===2?1:0)-rain)*ease;
     wet+=(rain-wet)*(1-Math.exp(-dt*(rain>wet?.3:.055)));

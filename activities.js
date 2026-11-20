@@ -5,7 +5,7 @@ const Bay=(()=>{
     {id:'race',symbol:'⚑',name:'海堤计时赛',x:-3.5,z:24,angle:-.7,parking:[-.8,23],desc:'开车穿过五道旗门，从海堤弯道冲向运河大道。碰撞会损失时间。'},
     {id:'volley',symbol:'●',name:'南滩排球场',x:-66,z:52,angle:0,parking:[-44,58],desc:'走到沙地上的落点，在球落下时按空格回击。回击时按 A／D 可以打向两翼。先得三分获胜。'},
     {id:'photo',symbol:'◎',name:'海岸摄影漫游',x:-74,z:90,angle:-.62,parking:[-42,87],desc:'从灯塔拍到汽车影院。在地标附近按 F 举起相机，转动镜头，对准后按 F 拍摄。'},
-    {id:'delivery',symbol:'▣',name:'潮汐冲印室',x:-5.85,z:123.7,angle:0,parking:[-.8,124],desc:'接下夜场配送，从柜台取片，在车尾装车，经港口验封后送到汽车影院。'},
+    {id:'delivery',symbol:'▣',name:'潮汐冲印室',...Town.filmCounter,angle:0,parking:[-.8,124],desc:'接下夜场配送，从柜台取片，在车尾装车，经港口验封后送到汽车影院。'},
     {id:'boulevard',sight:true,symbol:'═',name:'日落大道',x:46.4,z:28,angle:0,parking:[48,28],desc:'双向四车道试车段。北行经过信号灯与旅馆露台；T 切换时段，Y 切换天气。'}
   ];
   for(const v of NightBlocks.locations){const entry=NightBlocks.world(v,0,-2),park=NightBlocks.world(v,-2,-8);

@@ -9,7 +9,7 @@ const People=(()=>{
   cup.seal();
   const locals=[
     {x:9,z:.58,angle:0,model:2,seat:true}, {x:12.4,z:2.82,angle:Math.PI,model:3,seat:true},
-    {x:-9.1,z:-2.45,angle:2.7,model:1,seat:false}, {x:108.5,z:208.75,angle:.35,model:4,seat:false}
+    {x:-9.1,z:-2.45,angle:2.7,model:1,seat:false}, {x:113.5,z:202.75,angle:.35,model:4,seat:false}
   ];
   let streetTime=0;
   const paths=[

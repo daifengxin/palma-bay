@@ -134,9 +134,10 @@ const Town=(()=>{
   building(-13,73,13,13,9,'#a2c7bc','#ffbc9e','motel');
   building(4,82,10,10,6,'#d897ac','#f8c599');
   building(26,79,9,12,8,'#eab981','#a9cbbf','radio');
-  building(-13,121,10,9,5,'#e4a691','#f2cb9c');
+  building(-17,120,10,9,5,'#e4a691','#f2cb9c');
   building(14,124,9,9,5,'#a4c5ab','#f4ca99');
   function palm(x,z,h,phase){
+    if(nearestRoad(x,z).edge<.65)return;
     const lean=h*.085,leaf=['#415e38','#577643','#486b42','#76864c'];
     const trunk=(level,theta)=>{const t=level/18,r=(.29-.145*t)*(1+.08*Math.cos(level*Math.PI));
       return [x+lean*t*t+r*Math.cos(theta),h*t,z+.12*Math.sin(t*2)+r*Math.sin(theta)];};
@@ -160,7 +161,7 @@ const Town=(()=>{
   }
   [[-8,-7,10],[8,-2,9],[8,21,11],[-9,21,9],[-24,24,10],[-32,34,11],[-44,47,9],[-46,62,12],[-46,78,11],[-39,95,9],[-27,107,10],[23,39,10],[22,68,10],[23,96,9],[-8,112,9],[9,116,9],[-21,139,12],[19,145,13]].forEach(([x,z,h])=>palm(x,z,h,random()*5));
   for(let z=-26;z<145;z+=8){if([14,54,86].includes(z))continue;mesh.box(-49,0,z,.28,1.1,.28,'#b59292');mesh.box(-49,.79,z+4,.17,.18,8,'#ead0a8');}
-  mesh.box(0,0,34,.32,3.8,.34,'#5a5264');mesh.sign(0,2.3,33.76,7.4,1.58,names.junction);
+  mesh.box(0,0,39,.32,3.8,.34,'#5a5264');mesh.sign(0,2.3,38.76,7.4,1.58,names.junction);
   // The larger districts share geometry, collision footprints and navigation markers.
   function tower(x,z,w,d,h,body){
     blocks.push({x,z,w,d});mesh.material=5;mesh.box(x,0,z,w,h,d,body);
@@ -174,13 +175,13 @@ const Town=(()=>{
     }
     mesh.box(x,h,z,w*.75,2.1,d*.73,body);mesh.box(x,h+2.1,z,2,1.2,2,'#757e85');
   }
-  for(const args of [[-23,142,12,12,22,'#d2baad'],[19,162,13,12,34,'#9eb4af'],
+  for(const args of [[-30,142,12,12,22,'#d2baad'],[19,162,13,12,34,'#9eb4af'],
     [-15,183,10,12,43,'#adc2bf'],[12,183,14,11,31,'#bdaba6'],[36,185,13,14,21,'#c4c9b9'],
-    [-54,170,13,15,30,'#cdaf98'],[-55,197,11,12,25,'#acc2b7'],[-38,243,14,14,36,'#abc3bc'],
-    [-29,264,15,12,48,'#c6afb2'],[-12,275,11,15,36,'#9bafb7'],[3,263,9,10,19,'#c5b29e'],
-    [-2,318,11,11,27,'#c9b19f'],[62,301,14,11,40,'#a0b7be'],[84,324,18,12,30,'#c7b6ae']])tower(...args);
-  building(-11,132,10,12,5.8,'#c8d3bd','#e6a782','lab');
-  building(112,220,11,17,7.1,'#aa9381','#efac77','dock');
+    [-54,170,13,15,30,'#cdaf98'],[-60,192,11,12,25,'#acc2b7'],[-38,243,14,14,36,'#abc3bc'],
+    [-29,264,15,12,48,'#c6afb2'],[-12,275,11,15,36,'#9bafb7'],[-1,277,9,10,19,'#c5b29e'],
+    [-2,318,11,11,27,'#c9b19f'],[62,294,14,11,40,'#a0b7be'],[84,324,18,12,30,'#c7b6ae']])tower(...args);
+  building(-14.3,132,10,12,5.8,'#c8d3bd','#e6a782','lab');
+  building(117,214,11,17,7.1,'#aa9381','#efac77','dock');
   building(-67,332,11,10,8.4,'#d8ae99','#f6cb96','hotel');
   // Port cranes, stacked shipping containers, and riveted warehouse doors.
   for(const [x,z] of [[127,207],[135,245],[143,269]]){
@@ -190,7 +191,7 @@ const Town=(()=>{
     mesh.box(x+2,18.6,z,22,.27,.38,'#d89c59');mesh.box(x-7,7,z,.08,9,.08,'#53575a');
   }
   for(let i=0;i<30;i++){
-    const x=75+(i%5)*7.4,z=260+Math.floor(i/5)*5.6,h=i%4===0?5:2.55;
+    const x=64+(i%5)*7.4,z=260+Math.floor(i/5)*5.6,h=i%4===0?5:2.55;
     blocks.push({x,z,w:6.6,d:3.1});mesh.box(x,0,z,6.6,h,3.1,['#a8533b','#608181','#79838b','#bd8b53'][i%4]);
     for(let j=0;j<9;j++)mesh.box(x-3+j*.72,.1,z-1.58,.10,h-.2,.07,'#726f6b');
   }
@@ -214,7 +215,7 @@ const Town=(()=>{
     mesh.box(x-side*.62,5.14,z,1.3,.13,.13,'#74677b');
     mesh.box(x-side*1.12,5.01,z,.63,.13,.37,'#ffdda0');
   }
-  [[7,8,1],[-8,16,-1],[-30,49,1],[-45,71,-1],[21,57,1],[10,88,-1],[8,111,1]].forEach(v=>streetLamp(...v));
+  [[7,8,1],[-8,16,-1],[-20,49,1],[-45,71,-1],[21,57,1],[10,88,-1],[8,111,1]].forEach(v=>streetLamp(...v));
   for(let z of [26,47,69,91,108]){
     const x=-53.7;mesh.box(x,-.16,z,.13,2.1,.13,'#a07f7d');
     for(let j=0;j<8;j++){const a=j*Math.PI/4,b=(j+1)*Math.PI/4,c=[x,2.36,z];
@@ -222,7 +223,7 @@ const Town=(()=>{
     ground(x,z,1.4,2.3,-.09,'#ecbb9d');
   }
   ground(-53,56,7,168,-.115,'#e9c594');
-  for(const [x,z] of [[-8.5,2],[8.5,14],[-44,65],[22.8,84]]){
+  for(const [x,z] of [[-8.5,2],[8.5,14],[-45.5,65],[22.8,84]]){
     mesh.box(x,.48,z,.63,.13,1.9,'#c08b74');mesh.box(x+.28,.69,z,.1,.4,1.9,'#c08b74');
     for(const dz of [-.62,.62])mesh.box(x,.02,z+dz,.36,.46,.12,'#5d5867');
   }
@@ -237,7 +238,7 @@ const Town=(()=>{
   seal.material=6;seal.box(.04,1.11,-.206,.17,.088,.025,'#8de4ba');
   // At walking distance the shop fronts read as individual businesses.
   function pavement(x,z,w,d){mesh.material=8;ground(x,z,w,d,.016,'#c8b9a7');mesh.material=0;}
-  pavement(-10,-2.9,12,4.1);pavement(10.4,3.2,8,5);pavement(-6.6,124.4,8.1,2.7);
+  pavement(-10,-2.9,12,4.1);pavement(10.4,3.2,8,5);pavement(-11.4,124.4,8.1,2.7);
   function parasol(x,z){
     mesh.box(x,0,z,.06,2.28,.06,'#756d64');
     for(let j=0;j<16;j++){
@@ -259,15 +260,16 @@ const Town=(()=>{
     for(let row=0;row<3;row++)for(let k=0;k<5;k++)
       mesh.box(x-.45+k*.14,.48+row*.30,z-.414,.095,.17,.04,['#ce9d63','#ac614a','#9ea77b'][(row+k)%3]);
   }
-  vendor(-8.9,-.65);vendor(108.8,209.8);
-  mesh.box(-5.85,.05,124.65,2.2,1.0,.74,'#797367');mesh.box(-5.85,1.05,124.65,2.32,.085,.83,'#b79e7f');
-  mesh.sign(-5.85,.50,124.262,1.87,.36,names.counter);
-  mesh.box(-5.85,1.16,124.88,.72,.31,.34,'#53635c');
+  vendor(-8.9,-.65);vendor(113.8,203.8);
+  const filmCounter={x:-9.3,z:123.7};
+  mesh.box(filmCounter.x,.05,124.65,2.2,1.0,.74,'#797367');mesh.box(filmCounter.x,1.05,124.65,2.32,.085,.83,'#b79e7f');
+  mesh.sign(filmCounter.x,.50,124.262,1.87,.36,names.counter);
+  mesh.box(filmCounter.x,1.16,124.88,.72,.31,.34,'#53635c');
   for(const [x,z] of [[-5.4,-5.2],[-5.5,10.5],[5.2,22],[3.1,120],[98,232]]){
     mesh.plane(x,z,.68,1.12,.058,'#5b5b5b');
     for(let j=0;j<8;j++)mesh.plane(x,z-.45+j*.125,.56,.042,.061,'#30383c');
   }
-  for(const [x,z] of [[-10.5,-1.85],[10.3,4.3],[-9.9,124.1],[114,230]]){
+  for(const [x,z] of [[-10.5,-1.85],[10.3,4.3],[-13.2,124.1],[119,228]]){
     mesh.box(x,0,z,.7,.42,.66,'#a78368');
     for(let i=0;i<15;i++){
       const a=i*2.4,l=.26+random()*.22;
@@ -283,7 +285,7 @@ const Town=(()=>{
     for(let j=0;j<8;j++)mesh.quad([edge(a,j),edge(b,j),edge(b,j+1),edge(a,j+1)],color);
   }
   // Curved awnings, display windows and service lines give the opening block a human scale.
-  for(const [x,z,w,col] of [[-14,-.35,10.2,'#a1654b'],[15,5.45,9.7,'#638b83'],[-11,125.72,7.9,'#91866e']]){
+  for(const [x,z,w,col] of [[-14,-.35,10.2,'#a1654b'],[15,5.45,9.7,'#638b83'],[-14.3,125.72,7.9,'#91866e']]){
     for(let stripe=0;stripe<18;stripe++){
       const x0=x-w/2+w*stripe/18,x1=x0+w/18,c=stripe%2?col:'#ddcbaa';
       for(let j=0;j<5;j++){
@@ -293,7 +295,7 @@ const Town=(()=>{
       mesh.box((x0+x1)/2,2.32,z-.90,w/18,.13,.045,c);
     }
   }
-  const poles=[[-7.8,-16],[-7.8,6],[-7.8,24],[-24,31]];
+  const poles=[[-7.8,-16],[-7.8,6],[-7.8,21],[-24,30]];
   for(const [x,z] of poles){
     tube([x,0,z],[x,6.45,z],.105,'#816b55');mesh.box(x,5.96,z,1.44,.13,.15,'#736751');
     for(const d of [-.56,.56])mesh.box(x+d,6.08,z,.12,.22,.12,'#b6b4a0');
@@ -308,7 +310,8 @@ const Town=(()=>{
   for(const z of [32,40,48,56])ground(45.5,z,2.52,.075,.052,'#d0c9b8');
   const pastel=['#94cfbe','#e79c9d','#eed295'],tubeTint=['#70ffd7','#ff80b4','#ffd79c'];
   for(const side of [-1,1])for(let i=0;i<6;i++){
-    const z=36+i*18;if(side>0&&(Math.abs(z-63)<10||Math.abs(z-116)<10))continue;
+    const frontages=side<0?[41,54,72,90,108,126]:[39,null,null,90,null,130];
+    const z=frontages[i];if(z===null)continue;
     const k=(i+(side>0?1:0))%3,x=53+side*15.7,h=5.4+(i%3)*1.25;
     const sign=['solana','casa','coral'][k];
     building(x,z,10.2,11.3,h,pastel[k],'#ebd5ba',sign);
@@ -334,7 +337,7 @@ const Town=(()=>{
   for(let z=32;z<144;z+=14){palm(44.7,z,8.2+random()*1.7,random()*6);palm(61.4,z+2,9.1+random(),random()*6);}
   for(let z=36;z<142;z+=22)streetLamp(60.5,z,1);
   for(const z of [59,67])for(let x=46.8;x<=59.6;x+=1.22)ground(x,z,.61,2,.057,'#eee0ce');
-  const signals=[{x:59.5,z:58.2},{x:46.5,z:67.8},{x:6.6,z:13}];
+  const signals=[{x:60.8,z:57.9},{x:45.3,z:68.0},{x:6.6,z:13}];
   for(const [i,v] of signals.entries()){
     const side=i===1?-1:1;mesh.material=0;mesh.box(v.x,0,v.z,.15,5.25,.15,'#605b59');
     mesh.box(v.x-side*1.65,5.14,v.z,3.4,.13,.14,'#7d776c');
@@ -349,5 +352,5 @@ const Town=(()=>{
   const fleet=['#c3515b','#708780','#29363f'].map((color,id)=>makeCoupe(color,names.plate,id));
   NightBlocks.build(mesh,blocks,ground);
   const world=mesh.seal();Gfx.bakeShadows(world);Gfx.captureStreet(world);
-  return {world,fleet,floorAt,nearestRoad,signal,drawSignals,lit:lit.seal(),canister:canister.seal(),seal:seal.seal(),trafficCars,marker:marker.seal(),roads,blocks,targets,streets};
+  return {world,fleet,filmCounter,floorAt,nearestRoad,signal,drawSignals,lit:lit.seal(),canister:canister.seal(),seal:seal.seal(),trafficCars,marker:marker.seal(),roads,blocks,targets,streets};
 })();

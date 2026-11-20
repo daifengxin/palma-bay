@@ -11,7 +11,7 @@ const motion=new Locomotion();
 const camera={fov:Locomotion.baseFov,x:0,y:0,z:0,yaw:0,pitch:0};
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),turn=(a,b)=>Math.atan2(Math.sin(b-a),Math.cos(b-a));
 const modes={regular:{limit:82,damage:1},expert:{limit:57,damage:1.4}};
-const counter={x:-5.85,z:123.7};
+const counter=Town.filmCounter;
 const onFootSpeed={walk:2.5,run:5.5,loaded:2.12};
 function trunk(){return {x:car.x-2.82*Math.sin(car.yaw),z:car.z-2.82*Math.cos(car.yaw)};}
 function missionPoint(){
