@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>帕尔马湾 · Palma Bay</title><link rel="stylesheet" href="style.css"></head>
+<body>
+<canvas id="scene" aria-label="黄昏中的海滨街区"></canvas>
+<div class="grain"></div>
+<header><div class="brand"><i></i> PALMA <span>STUDIOS</span></div><button id="sound" aria-label="切换游戏声音" aria-pressed="false">声音　关</button></header>
+<main id="cover">
+<div class="cover-inner"><div class="eyebrow"><b></b> OCEAN DRIVE <span>/</span> 日落大道</div>
+<h1>PALMA<br><em>BAY</em><small>帕尔马湾</small></h1>
+<p>日落大道的晚高峰开始了。靠近来车按 E 示意停车，<br>走到驾驶门再按 E 接管。按 M 查看海湾地图。</p>
+<div class="modes" aria-label="选择难度"><button data-mode="regular" aria-pressed="true">标准挑战</button><button data-mode="expert" aria-pressed="false">高手挑战</button></div>
+<button id="start">进入海湾 <strong>↗</strong></button><span class="startkey">或按 ENTER</span></div>
+</main>
+<section id="hud" hidden><div class="mission"><small id="stage">放映任务</small><strong id="goal"></strong><span id="hint"></span></div><div class="clock"><small id="clockLabel">PALMA BAY</small><b id="time"></b><span id="condition"></span></div>
+<div class="wallet"><b id="money"></b><span id="stars"></span><small id="pendingBag"></small><small id="weaponTag"></small></div><div id="pressure" hidden><label id="pressureText" for="pressureBar">威慑度</label><progress id="pressureBar" max="1"></progress></div><div id="sight" hidden></div><div class="vitals"><label>生命 <progress id="lifeBar" max="100" value="100"></progress></label><label>体力 <progress id="staminaBar" max="100" value="100"></progress></label></div><div class="mapbox"><canvas id="map" width="196" height="186" aria-label="街区小地图"></canvas><span id="street"></span></div>
+<div class="drive"><span id="vehicleName"></span><b id="speed">0</b> <small id="unit">KM/H</small></div><div class="keys" id="controls">WASD 移动　·　Shift 奔跑　·　拖动环视 / 滚轮拉近　·　E 上下车 / 取件　·　F 活动　·　M 地图　·　X 退出活动</div></section>
+<button id="mapToggle" hidden>M　海湾地图</button>
+<div id="finder" hidden><i></i><span>PALMA 35　 /　F 快门</span></div><div id="flash"></div>
+<section id="atlas" hidden aria-label="海湾地图"><div class="atlas-card"><div class="atlas-head"><div><small>PALMA BAY　 /　FIELD GUIDE</small><h2>海湾地图</h2></div><button id="closeAtlas">关闭　×</button></div>
+<div class="atlas-grid"><canvas id="atlasMap" width="350" height="430" aria-label="海湾路网和活动地点"></canvas><div><div id="venues"></div><div id="destination"></div><button id="pin">标记路线</button> <button id="travel">前往此处</button></div></div><div class="envbox"><span id="environment">南岸当地</span><button id="timePreset">T　切换时段</button><button id="weatherPreset">Y　切换天气</button></div><div id="album"></div></div></section>
+<section id="market" hidden role="dialog" aria-modal="true" aria-labelledby="marketTitle"><div class="service-card"><small>B1　 /　PALMA MOTOR WORKS</small><div class="service-head"><h2 id="marketTitle">地下黑市车库</h2><b id="marketCash"></b></div><p id="marketNote" aria-live="polite"></p><div id="marketItems"></div><button id="inspectBay">回到车内</button> <button id="marketExit">驶回街区　↗</button></div></section>
+<section id="result" hidden><div class="result-card"><small id="outcome"></small><h2 id="resultTitle"></h2><p id="summary"></p><button id="again">继续逛　↗</button> <button id="back">返回标题</button></div></section>
+<a id="credits" href="credits.html" target="_blank" rel="noopener">美术素材署名</a><div id="error" hidden>当前浏览器无法启动 3D 场景，请用启用硬件加速的桌面浏览器打开。</div>
+<script src="climate.js"></script><script src="driving.js"></script><script src="graphics.js"></script><script src="coupe.js"></script><script src="concept-geometry.js"></script><script src="hero-car.js"></script><script src="portrait.js"></script><script src="three-vendor.js"></script><script src="character-builder.js"></script><script src="locomotion.js"></script><script src="footfalls.js"></script><script src="character-pass.js"></script><script src="people.js"></script><script src="beach.js"></script><script src="night-blocks.js"></script><script src="town.js"></script><script src="motorpool.js"></script><script src="traffic.js"></script><script src="night-market.js"></script><script src="street.js"></script><script src="activities.js"></script><script src="game.js"></script></body></html>
