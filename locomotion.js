@@ -48,15 +48,15 @@ class Locomotion {
     w.sprint+=(ground*moving*running-w.sprint)*blend;
     w.jump+=((air?1:0)-w.jump)*blend;w.idle=1-w.walk-w.sprint-w.jump;
     this.time+=dt;
-    const strideFactor=4.15+(2.48-4.15)*running;
+    const strideFactor=4.55+(2.48-4.55)*running;
     const prev=this.walkCycle;
     this.walkCycle+=speed*dt*strideFactor;
     const phase=this.walkCycle,amplitude=w.walk+w.sprint;
-    this.pelvisY=.91-.105*w.walk-.148*w.sprint-.065*w.jump+
-      Math.abs(Math.sin(phase))*(.037*w.walk+.083*w.sprint);
-    this.sway=.008*w.idle*Math.sin(this.time*.79)+.019*amplitude*Math.cos(phase);
+    this.pelvisY=.91-.081*w.walk-.148*w.sprint-.065*w.jump+
+      (.5-.5*Math.cos(2*phase))*.027*w.walk+Math.abs(Math.sin(phase))*.083*w.sprint;
+    this.sway=.008*w.idle*Math.sin(this.time*.79)+.024*w.walk*Math.sin(phase)+.019*w.sprint*Math.cos(phase);
     if(swimming){this.ready=false;this.wasAir=air;return;}
-    const duty=this.duty=.48-.226*running,span=Locomotion.tau/strideFactor,lead=span*duty*.5;
+    const duty=this.duty=.56-.306*running,span=Locomotion.tau/strideFactor,lead=span*duty*.5;
     const sn=Math.sin(p.yaw),cs=Math.cos(p.yaw);
     const tx=speed>.02?dx/(speed*dt):sn,tz=speed>.02?dz/(speed*dt):cs;
     if(!this.ready){
@@ -108,7 +108,7 @@ class Locomotion {
         f.sole.set(THREE.MathUtils.lerp(f.anchor.x,neutralX+tx*distance,ease),0,THREE.MathUtils.lerp(f.anchor.z,neutralZ+tz*distance,ease));
         const lift=Math.sin(Math.PI*t);
         f.toePitch=lift*(.17*w.walk+.52*w.sprint)*Math.sin(Locomotion.tau*t);
-        f.sole.y=THREE.MathUtils.lerp(f.anchor.y,Town.floorAt(f.sole.x,f.sole.z),ease)+lift*(1+.24*Math.cos(Math.PI*t))*(.105*w.walk+.34*w.sprint);
+        f.sole.y=THREE.MathUtils.lerp(f.anchor.y,Town.floorAt(f.sole.x,f.sole.z),ease)+lift*(1+.24*Math.cos(Math.PI*t))*(.080*w.walk+.34*w.sprint);
         f.footYaw=f.yaw+turn(f.yaw,p.yaw)*ease;
       }
       f.swing=u>duty?Math.sin(Math.PI*(u-duty)/(1-duty)):0;
@@ -129,7 +129,7 @@ class Locomotion {
     b.pelvis.position.set(this.sway,hips,-.012);b.pelvis.rotation.set(0,0,0);
     b.chest.scale.set(1+.011*breath*w.idle,1+.004*breath*w.idle,1+.027*breath*w.idle);
     b.chest.rotation.set(.055*w.walk+.305*w.sprint+.13*w.jump-.014*breath*w.idle,
-      -.115*Math.cos(phase)*stride,-this.bank-.025*stride*Math.cos(phase));
+      -.085*Math.sin(phase)*w.walk-.115*Math.cos(phase)*w.sprint,-this.bank-.025*stride*Math.cos(phase));
     b.head.rotation.set(-.12*w.sprint+.009*breath,.035*w.idle*Math.sin(time*.64),this.bank*.35);
     for(const f of this.feet){
       const k=f.side<0?'L':'R',angle=phase+(f.side<0?0:Math.PI)-Math.PI*this.duty;

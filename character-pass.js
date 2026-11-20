@@ -129,7 +129,8 @@ const CharacterPass=(()=>{
   }
   const sceneCanvas=document.getElementById('scene');
   function flush(){
-    if(!count.some(n=>n)&&!effectsVisible)return;
+    const particlesVisible=CityEffects.renderParticles(scene,sceneCanvas.height);
+    if(!count.some(n=>n)&&!effectsVisible&&!particlesVisible)return;
     Gfx.withCharacterContext(gl=>{
       if(!renderer){
         renderer=new THREE.WebGLRenderer({canvas:sceneCanvas,context:gl,antialias:true,alpha:false});

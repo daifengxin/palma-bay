@@ -69,7 +69,9 @@ const Street=(()=>{
       if(height<.05||height>(p.seat?1.37:1.83))continue;
       depth=along;target=p;
     }
-    if(!target)return;
+    const hazard=CityEffects.rayTarget(yaw,pitch,depth,eye);
+    if(hazard)depth=hazard.depth;
+    if(!target&&!hazard)return;
     const blockers=[car,...Traffic.cars,...parked];
     for(let s=.2;s<depth;s+=.24){
       const x=player.x+sn*s,z=player.z+cs*s;
@@ -79,6 +81,7 @@ const Street=(()=>{
         return eye-s*Math.tan(pitch)<Town.floorAt(x,z)+1.6+(v.lift||0)&&Math.abs(dx*c-dz*n)<1.04&&Math.abs(dx*n+dz*c)<2.28;
       }))return;
     }
+    if(hazard){CityEffects.arm(hazard.prop);return;}
     if(knock(target,yaw,3)){
       drops.push({x:target.x,z:target.z,value:12+target.model*7,life:45});
       note('现金掉落 · 靠近按 E 拾取');
@@ -86,13 +89,23 @@ const Street=(()=>{
   }
   function bumpVehicle(v,relative){
     if(relative<6||Math.abs(car.speed)<5||v.crash)return;
-    const dx=v.x-car.x,dz=v.z-car.z,d=Math.hypot(dx,dz)||1,power=Math.min(21,relative);
-    v.crash={vx:dx/d*power*.62,vz:dz/d*power*.62,vy:2.2+power*.26,y:0,age:0,
-      twist:dx*Math.cos(car.yaw)-dz*Math.sin(car.yaw)>=0?1:-1};
-    car.speed*=.7;
+    launchVehicle(v,car,Math.min(21,relative));car.speed*=.7;
+    note('撞击！车辆失去平衡');
+  }
+  function launchVehicle(v,origin,power){
+    const dx=v.x-origin.x,dz=v.z-origin.z,d=Math.hypot(dx,dz)||1;
+    v.crash={vx:dx/d*power*.62,vz:dz/d*power*.62,vy:2.2+power*.26,y:v.lift||0,age:0,
+      twist:dx*Math.cos(v.yaw)-dz*Math.sin(v.yaw)>=0?1:-1};
     if(flagged===v)flagged=null;
     if(Traffic.cars.includes(v))People.eject(v);
-    note('撞击！车辆失去平衡');
+  }
+  function blast(origin){
+    for(const p of People.actors()){
+      const d=dist(p,origin);if(d<11)knock(p,Math.atan2(p.x-origin.x,p.z-origin.z),5+(11-d)*1.3);
+    }
+    for(const v of [car,...parked,...Traffic.cars]){
+      const d=dist(v,origin);if(d<10&&!v.crash){launchVehicle(v,origin,7+(10-d)*1.25);if(v===car)v.speed=0;}
+    }
   }
   function slide(o,b,dt,radius){
     const x=o.x+b.vx*dt,z=o.z+b.vz*dt;
@@ -103,7 +116,7 @@ const Street=(()=>{
     if(flagged&&(elapsed>=flagged.waitUntil||state.activity!=='roam'||state.vehicle||dist(player,flagged)>13)){
       flagged.waitUntil=0;flagged=null;
     }
-    for(const v of [...Traffic.cars,...parked]){
+    for(const v of [car,...Traffic.cars,...parked]){
       const b=v.crash;if(!b)continue;
       b.age+=dt;slide(v,b,dt,1.15);b.vy-=12*dt;b.y=Math.max(0,b.y+b.vy*dt);
       const drag=Math.exp(-dt*(b.y>0?.75:5));b.vx*=drag;b.vz*=drag;
@@ -165,5 +178,5 @@ const Street=(()=>{
     else if(!spareNear()&&dist(player,driverDoor())>1.55&&candidate())hint='E 示意来车停车';
     if(hint&&performance.now()>=toastUntil)$('hint').textContent=hint;
   }
-  return {reacting:p=>reactions.has(p),reset,interact,hitWalkers,bumpVehicle,fire,tick,drawReaction,drawCash,key,ui};
+  return {blast,reacting:p=>reactions.has(p),reset,interact,hitWalkers,bumpVehicle,fire,tick,drawReaction,drawCash,key,ui};
 })();

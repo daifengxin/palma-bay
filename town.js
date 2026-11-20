@@ -1,6 +1,6 @@
 'use strict';
 const Town=(()=>{
-  const mesh=new Gfx.Mesh(), blocks=[];
+  const mesh=new Gfx.Mesh(), blocks=[], fixtures=[];
   const start=[[0,-18],[0,25]], coast=[[0,25],[-24,39],[-38,58],[-38,79],[-25,97],[0,110]],
         alley=[[0,25],[16,46],[16,90],[0,110]],finish=[[0,110],[0,135]];
   const roads=[{points:start,width:13},{points:coast,width:12},{points:alley,width:7},{points:finish,width:13}];
@@ -65,7 +65,9 @@ const Town=(()=>{
   for(let i=0;i<76;i++){
     const x=-120+random()*370,z=394+random()*85,w=7+random()*10,h=12+random()*62;
     mesh.material=5;mesh.box(x,0,z,w,h,8+random()*10,['#acc1bd','#899da6','#bdaca9'][i%3]);
-    mesh.material=0;mesh.box(x,h,z,w*.70,2+random()*4,6,'#99a4a8');
+    const cap=2+random()*4;mesh.material=0;mesh.box(x,h,z,w*.89,.36,7.9,'#d6c6af');
+    mesh.material=5;mesh.box(x,h+.36,z,w*.70,cap,6,'#8fa9ae');mesh.material=0;
+    if(i%3===0){mesh.box(x,h+cap+.36,z,w*.48,2.8,4.1,'#b7afa3');mesh.box(x,h+cap+3.16,z,.18,3.9,.18,'#9dabb1');}
   }
   function disk(m,x,y,z,rx,rz,color,count=18){for(let j=0;j<count;j++){let a=j*2*Math.PI/count,b=(j+1)*2*Math.PI/count;
     const center=[x,y,z];m.quad([center,[x+rx*Math.cos(a),y,z+rz*Math.sin(a)],[x+rx*Math.cos(b),y,z+rz*Math.sin(b)],center],color);}}
@@ -160,20 +162,33 @@ const Town=(()=>{
     }
   }
   [[-8,-7,10],[8,-2,9],[8,21,11],[-9,21,9],[-24,24,10],[-32,34,11],[-44,47,9],[-46,62,12],[-46,78,11],[-39,95,9],[-27,107,10],[23,39,10],[22,68,10],[23,96,9],[-8,112,9],[9,116,9],[-21,139,12],[19,145,13]].forEach(([x,z,h])=>palm(x,z,h,random()*5));
-  for(let z=-26;z<145;z+=8){if([14,54,86].includes(z))continue;mesh.box(-49,0,z,.28,1.1,.28,'#b59292');mesh.box(-49,.79,z+4,.17,.18,8,'#ead0a8');}
+  for(let z=-26;z<145;z+=8){if([14,54,86].includes(z))continue;fixtures.push({kind:'fence',x:-49,z:z+4});}
   mesh.box(0,0,39,.32,3.8,.34,'#5a5264');mesh.sign(0,2.3,38.76,7.4,1.58,names.junction);
   // The larger districts share geometry, collision footprints and navigation markers.
   function tower(x,z,w,d,h,body){
-    blocks.push({x,z,w,d});mesh.material=5;mesh.box(x,0,z,w,h,d,body);
-    mesh.material=0;
-    for(let y=3;y<h-1;y+=3.15){
-      mesh.box(x,y,z,w+.29,.14,d+.29,'#cebdab');
-      const side=Math.round(x)%2?-1:1,bal=x+side*w*.22;
-      mesh.box(bal,y-.11,z-d/2-.58,w*.42,.22,1.22,'#c8b7a5');
-      mesh.material=2;mesh.box(bal,y+.03,z-d/2-1.10,w*.40,.74,.045,'#869f9b');mesh.material=0;
-      mesh.box(bal,y+.77,z-d/2-1.10,w*.42,.055,.06,'#bebaad');
+    blocks.push({x,z,w,d});
+    const style=Math.abs(Math.round(x+z))%3;
+    const glass=['#65929a','#819394','#7795a9'][style],stone=['#e4cbb0','#c9d5c6','#cdb7a5'][style];
+    const podium=4.6,shoulder=Math.floor(h*.77/3)*3;
+    mesh.material=9;mesh.box(x,0,z,w,podium,d,stone);
+    mesh.material=11;mesh.box(x,0.38,z-d*.5-.04,w*.78,3.4,.09,'#536b70');
+    for(let i=-2;i<=2;i++){mesh.material=0;mesh.box(x+i*w*.19,0,z-d*.5-.12,.27,podium,.32,stone);}
+    mesh.material=5;mesh.box(x,podium,z,w*.94,shoulder-podium,d*.94,glass);
+    mesh.box(x,shoulder,z,w*.81,h-shoulder,d*.84,glass);
+    mesh.material=0;mesh.box(x,podium-.32,z,w+.22,.32,d+.22,stone);
+    for(let y=podium+2.9;y<shoulder;y+=style===0?3.05:6.1){
+      mesh.box(x,y,z,w*.96,.17,d*.96,stone);
+      if(style===0)mesh.box(x+w*.18,y+.18,z-d*.47,w*.48,.51,.60,'#8caaa9');
     }
-    mesh.box(x,h,z,w*.75,2.1,d*.73,body);mesh.box(x,h+2.1,z,2,1.2,2,'#757e85');
+    for(let i=-1;i<=1;i+=2){
+      mesh.box(x+i*w*.39,podium,z-d*.47,.22,h-podium+.8,.27,stone);
+      mesh.material=6;mesh.box(x+i*w*.39,shoulder,z-d*.47-.15,.075,h-shoulder+.8,.06,'#ffcd98');mesh.material=0;
+    }
+    mesh.box(x,shoulder,z,w*.97,.27,d*.97,stone);
+    mesh.box(x,h,z,w*.84,.34,d*.87,stone);
+    mesh.material=5;mesh.box(x,h+.34,z,w*.56,2.5+style,d*.53,body);
+    mesh.material=6;mesh.box(x,h+2.84+style,z,w*.58,.13,d*.55,['#ffc09d','#88dbcb','#dda3c8'][style]);
+    mesh.material=0;if(style===2){mesh.box(x,h+3,z,1.7,3.4,1.7,stone);mesh.box(x,h+6.4,z,.12,3.2,.12,'#a9aeb4');}
   }
   for(const args of [[-30,142,12,12,22,'#d2baad'],[19,162,13,12,34,'#9eb4af'],
     [-15,183,10,12,43,'#adc2bf'],[12,183,14,11,31,'#bdaba6'],[36,185,13,14,21,'#c4c9b9'],
@@ -211,15 +226,11 @@ const Town=(()=>{
   for(const [x,z] of [[-42,185],[-41,205],[35,140],[55,179],[73,199],[117,234],[115,272],[32,284],[1,301],[-31,320],[-63,346],[-43,346]])palm(x,z,9+random()*2,random()*6);
   // Small street furniture gives the player scale when walking or turning.
   function streetLamp(x,z,side){
-    mesh.box(x,0,z,.15,5.25,.15,'#74677b');
-    mesh.box(x-side*.62,5.14,z,1.3,.13,.13,'#74677b');
-    mesh.box(x-side*1.12,5.01,z,.63,.13,.37,'#ffdda0');
+    fixtures.push({kind:'lamp',x,z,yaw:side>0?0:Math.PI});
   }
   [[7,8,1],[-8,16,-1],[-20,49,1],[-45,71,-1],[21,57,1],[10,88,-1],[8,111,1]].forEach(v=>streetLamp(...v));
   for(let z of [26,47,69,91,108]){
-    const x=-53.7;mesh.box(x,-.16,z,.13,2.1,.13,'#a07f7d');
-    for(let j=0;j<8;j++){const a=j*Math.PI/4,b=(j+1)*Math.PI/4,c=[x,2.36,z];
-      mesh.quad([c,[x+1.9*Math.cos(a),1.83,z+1.9*Math.sin(a)],[x+1.9*Math.cos(b),1.83,z+1.9*Math.sin(b)],c],j%2?'#fff0bd':'#ea8e86');}
+    const x=-53.7;fixtures.push({kind:'umbrella',x,z});
     ground(x,z,1.4,2.3,-.09,'#ecbb9d');
   }
   ground(-53,56,7,168,-.115,'#e9c594');
@@ -240,12 +251,7 @@ const Town=(()=>{
   function pavement(x,z,w,d){mesh.material=8;ground(x,z,w,d,.016,'#c8b9a7');mesh.material=0;}
   pavement(-10,-2.9,12,4.1);pavement(10.4,3.2,8,5);pavement(-11.4,124.4,8.1,2.7);
   function parasol(x,z){
-    mesh.box(x,0,z,.06,2.28,.06,'#756d64');
-    for(let j=0;j<16;j++){
-      const a=j*Math.PI/8,b=(j+1)*Math.PI/8,c=[x,2.65,z];
-      const edge=t=>[x+1.46*Math.cos(t),2.19,z+1.46*Math.sin(t)];
-      mesh.quad([c,edge(a),edge(b),c],j%4<2?'#ae755c':'#ded2af');
-    }
+    fixtures.push({kind:'umbrella',x,z});
     disk(mesh,x,.74,z,.57,.57,'#886854',24);
     for(const sign of [-1,1]){
       const zz=z+sign*.82;
@@ -352,5 +358,5 @@ const Town=(()=>{
   const fleet=['#c3515b','#708780','#29363f'].map((color,id)=>makeCoupe(color,names.plate,id));
   NightBlocks.build(mesh,blocks,ground);
   const world=mesh.seal();Gfx.bakeShadows(world);Gfx.captureStreet(world);
-  return {world,fleet,filmCounter,floorAt,nearestRoad,signal,drawSignals,lit:lit.seal(),canister:canister.seal(),seal:seal.seal(),trafficCars,marker:marker.seal(),roads,blocks,targets,streets};
+  return {world,fixtures,fleet,filmCounter,floorAt,nearestRoad,signal,drawSignals,lit:lit.seal(),canister:canister.seal(),seal:seal.seal(),trafficCars,marker:marker.seal(),roads,blocks,targets,streets};
 })();

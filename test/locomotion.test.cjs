@@ -88,3 +88,19 @@ test('sprint contact effects expire and footprints only appear on sand',()=>{
   fx.update([],4.6,2.7,camera);assert.ok(fx.clouds.every(c=>!c.mesh.visible)&&fx.prints[0].mesh.visible);
   assert.equal(fx.update([],6.5,4.6,camera),false);
 });
+test('walking transfers weight through double support with fixed planted soles',()=>{
+  const {motion,tick}=simulation();
+  let doubleSupport=0,swings=0;const last=new Map();
+  for(let i=0;i<240;i++){
+    tick(0,1.85);
+    if(i<30)continue;
+    if(motion.feet.every(f=>f.contact))doubleSupport++;
+    if(motion.feet.some(f=>!f.contact&&f.sole.y>.04))swings++;
+    for(const f of motion.feet){
+      if(!f.contact){last.delete(f.side);continue;}
+      if(last.has(f.side))assert.ok(last.get(f.side).distanceTo(f.sole)<1e-8);
+      last.set(f.side,f.sole.clone());
+    }
+  }
+  assert.ok(doubleSupport>10&&swings>30);
+});

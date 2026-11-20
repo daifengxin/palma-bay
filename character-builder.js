@@ -351,8 +351,8 @@ class CharacterBuilder {
   }
   static pose(actor,phase,speed,carry,reach,time){
     const b=actor.nodes,breath=Math.sin(time*1.54),idle=1-Math.min(1,speed),sway=idle*Math.sin(time*.79);
-    b.pelvis.position.x=.008*sway;b.pelvis.position.y=.91+.016*speed*(1-Math.cos(2*phase));
-    b.pelvis.rotation.set(-.022,.035*Math.sin(phase)*speed,.018*sway);
+    b.pelvis.position.x=.008*sway+.017*speed*Math.cos(phase);b.pelvis.position.y=.91+.016*speed*(1-Math.cos(2*phase));
+    b.pelvis.rotation.set(-.022,.072*Math.sin(phase)*speed,.018*sway+.021*speed*Math.cos(phase));
     b.chest.scale.set(1+.011*breath,1+.004*breath,1+.027*breath);
     b.chest.rotation.set(-.014*breath,-.09*Math.sin(phase)*speed,-.022*sway);
     b.head.rotation.set(.010*Math.sin(time*1.1),.038*Math.sin(time*.64)*idle,.006*sway);
@@ -360,7 +360,7 @@ class CharacterBuilder {
       const k=s<0?'L':'R',swing=s*Math.sin(phase)*speed,flex=Math.max(0,-s*Math.cos(phase))*speed,seated=reach<-.5;
       b['hip'+k].rotation.set(seated?-1.42:.54*swing+.018*s,0,0);
       b['knee'+k].rotation.set(seated?1.42:.76*flex,0,0);
-      b['ankle'+k].rotation.set(seated?.12:-.26*flex,0,0);
+      b['ankle'+k].rotation.set(seated?.12:-.23*flex+.09*swing,0,0);
       b['shoulder'+k].rotation.set(-.53*swing*(1-carry)-.34*carry-.92*Math.max(0,reach)+.037*s+.025*breath,0,s*(.054+.014*Math.cos(time+s)*idle));
       b['elbow'+k].rotation.set(-.14-.94*carry-.32*flex-.26*Math.max(0,reach),0,0);
       b['wrist'+k].rotation.set(.12+.065*Math.sin(time*1.25+s)*idle+.08*swing,.045*s,.045*s);

@@ -101,7 +101,10 @@ const Gfx = (() => {
           vec2 w=vec2(abs(n.x)>.5?world.z:world.x,world.y)/vec2(2.75,3.05);
           vec2 f=fract(w);float window=step(.10,f.x)*step(f.x,.91)*step(.15,f.y)*step(f.y,.88);
           vec3 glass=mix(vec3(.15,.27,.32),horizon(r)*.77,clamp(.30+r.y,0.,.9));
-          if(hash(floor(w))>.83)glass=mix(glass,vec3(.96,.71,.43),.66);
+          float fres=pow(1.-max(dot(V,n),0.),2.);
+          glass=mix(glass,panorama(r,horizon(r)),.16+.26*fres);
+          float lamp=step(.78,hash(floor(w)+floor(world.xz*.013)))*(1.-smoothstep(-.18,.42,climate.x));
+          glass=mix(glass,vec3(.99,.72,.43),lamp*.73);
           c=mix(c,glass*(.82+.20*noise(floor(w))),window);
         }else if(mat>5.5&&mat<6.5)c=base*(1.06+.12*base);
         else if(mat>6.5&&mat<7.5){

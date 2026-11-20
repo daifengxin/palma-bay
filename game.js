@@ -12,7 +12,7 @@ const camera={fov:Locomotion.baseFov,x:0,y:0,z:0,yaw:0,pitch:0};
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),turn=(a,b)=>Math.atan2(Math.sin(b-a),Math.cos(b-a));
 const modes={regular:{limit:82,damage:1},expert:{limit:57,damage:1.4}};
 const counter=Town.filmCounter;
-const onFootSpeed={walk:2.5,run:5.5,loaded:2.12};
+const onFootSpeed={walk:1.85,run:5.5,loaded:1.62};
 function trunk(){return {x:car.x-2.82*Math.sin(car.yaw),z:car.z-2.82*Math.cos(car.yaw)};}
 function missionPoint(){
   if(state.activity!=='delivery')return Bay.target();
@@ -50,7 +50,7 @@ function start(){
   motion.reset();CharacterPass.clearFootfalls();camera.fov=Locomotion.baseFov;
   Object.assign(car,{garageId:'coupe',x:3.7,z:-6,yaw:0,speed:5,model:-1,steering:0,roll:0});
   Object.assign(player,{x:44.06,z:36,yaw:0,stride:0,pace:0,stamina:100,wind:false});
-  Driving.reset(car);car.siren=false;Motorpool.reset();
+  Driving.reset(car);car.crash=null;CityEffects.reset();car.siren=false;Motorpool.reset();
   Object.assign(player,{height:0,vertical:0,life:100,action:'idle'});state.seat=null;state.cockpit=false;
   People.reset();Street.reset();Traffic.reset();resetParked();parked.forEach((v,i)=>v.garageId='bay-'+i);NightMarket.reset();
   const limit=modes[mode].limit;
@@ -84,6 +84,7 @@ function atStop(){
 }
 function impact(speed,traffic){
   if(elapsed-state.lastHit<1.35||speed<2.8)return;
+  CityEffects.sound('metal',Math.min(speed/15,1));if(speed>11)CityEffects.sound('glass',.65);
   state.hits++;state.lastHit=elapsed;Motorpool.impact(car,speed);
   player.life=Math.max(1,player.life-Math.round(Math.max(0,speed-8)*.65));
   const loss=Math.min(65,Math.round((speed*2.0+(traffic?6:0))*modes[mode].damage));
@@ -120,7 +121,7 @@ function jump(){
   player.vertical=4.65;player.stamina-=8;player.action='jump';
 }
 function interact(){
-  if(state.phase!=='play'||state.seat||player.height>.04)return;
+  if(state.phase!=='play'||state.seat||car.crash||player.height>.04)return;
   if(NightMarket.interact()||Street.interact())return;
   const door=driverDoor();
   if(Bay.aiming()||state.activity==='volley')return;
@@ -159,7 +160,8 @@ function physics(dt){
   const go=axis(['KeyW','ArrowUp'],['KeyS','ArrowDown']),steer=axis(['KeyD','ArrowRight'],['KeyA','ArrowLeft']);
   if(state.seat){seatStep(dt);return;}
   state.door=Math.max(0,state.door-dt*1.8);
-  if(!state.owned){
+  if(state.vehicle&&car.crash)return;
+  if(!state.owned&&!car.crash){
     // Occupied coupe rolls up to the first light, then on to a second, permanent taxi stand.
     const stop=state.stopClock>8?23:13.5, gap=stop-car.z;
     car.speed=gap>.03?Math.min(5,Math.max(.3,gap*1.5)):0;
@@ -225,7 +227,10 @@ function physics(dt){
     if(separating&&fits){car.x=nx;car.z=nz;car.yaw=yaw;}else car.speed*=Math.exp(-dt*18);
   }else{
     state.inContact=false;
-    if(fits){car.x=nx;car.z=nz;car.yaw=yaw;}
+    if(fits){
+      if(CityEffects.vehicleHit(nx,nz,yaw,car.speed)){car.speed=0;car.slide=0;}
+      else{car.x=nx;car.z=nz;car.yaw=yaw;}
+    }
     else{impact(Math.abs(car.speed),false);car.speed=0;car.slide=0;}
   }
   if(state.phase!=='play')return;
@@ -316,7 +321,8 @@ function render(dt){
   const sprintView=state.phase==='play'&&!state.vehicle&&!state.seat&&!Bay.aiming()&&!NightMarket.aiming()&&!Bay.swimmer()?motion.weights.sprint:0;
   const targetFov=Locomotion.baseFov+sprintView*7*Math.PI/180;
   camera.fov+=(targetFov-camera.fov)*(-Math.expm1(-10*dt));
-  CharacterPass.begin(camera);Gfx.begin([camera.x,camera.y,camera.z],camera.yaw,camera.pitch,-1,false,1/Math.tan(camera.fov/2));Gfx.draw(Town.world);
+  const view=CityEffects.shaken(camera);
+  CharacterPass.begin(view);Gfx.begin([view.x,view.y,view.z],view.yaw,view.pitch,-1,false,1/Math.tan(view.fov/2));Gfx.draw(Town.world);CityEffects.draw();
   for(const other of Traffic.cars)if(Math.hypot(other.x-camera.x,other.z-camera.z)<145){
     drawCar(other);
     if(!other.crash&&dist(other,camera)<32){
@@ -350,7 +356,7 @@ function frame(now){
     elapsed+=dt;Climate.tick(dt);Motorpool.tick(dt);Traffic.update(elapsed,car,parked);People.update(dt,car,state.vehicle?null:player);
     state.remaining=Math.max(0,(state.deadline-now)/1000);
     if(!state.remaining)finish(false);
-    else{for(let rest=dt;rest>1e-9&&state.phase==='play'&&!NightMarket.panel;rest-=1/60){const step=Math.min(rest,1/60);if(NightMarket.sublevel)NightMarket.garageDrive(step);else if(!Bay.aiming())physics(step);if(state.phase==='play'){Bay.tick(step);NightMarket.tick(step);Street.tick(step);}}if(state.phase==='play')hud();}
+    else{for(let rest=dt;rest>1e-9&&state.phase==='play'&&!NightMarket.panel;rest-=1/60){const step=Math.min(rest,1/60);if(NightMarket.sublevel)NightMarket.garageDrive(step);else if(!Bay.aiming())physics(step);if(state.phase==='play'){Bay.tick(step);NightMarket.tick(step);Street.tick(step);if(!NightMarket.sublevel)CityEffects.tick(step);}}if(state.phase==='play')hud();}
   }
   render(dt);Gfx.finishFrame();Bay.capture();audioTick();requestAnimationFrame(frame);
 }

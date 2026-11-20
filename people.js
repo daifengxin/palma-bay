@@ -41,7 +41,7 @@ const People=(()=>{
     const blocked=car&&!a.cross&&Math.hypot(car.x-a.x,car.z-a.z)<3.1;
     a.walk=moving&&!blocked?.80:0;a.yaw=Math.atan2(s.dx*sign,s.dz*sign);
     if(!blocked)a.t+=dt*a.speed;
-    a.phase+=dt*(a.walk?5.5*a.speed:1.15);
+    if(a.walk)a.phase+=dt*4.75*a.speed;
   }
   const owner=resident([[0,0],[1,0]],1,0);
   let ownerActive=false;
